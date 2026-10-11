@@ -1,0 +1,6 @@
+cc6e82d25d4dc94683ff9e8c18de4c7bf8f62ebddaf476b550525da7b02d6442  LibHeifSharp-3.2.0-source.tar.gz
+a93c2c44f615e57ba779d7348fe5e00ed2b3bb43ba2ed6087d7bfb34d6abe9bb  build-native.ps1
+87ea0df6f9f8bd4e65943362cf25f6fe1bd833401c7d0d83ffd4ce96cab57409  libde265-1.1.3-patched-source.tar.gz
+6b7b7291ec1688b4963b2a5d1a8f154290558b1685cc0f34ee8717d3f189e819  libde265-max-nal-size.patch
+640b27e126813f2d75bca83cf5ea60ff2c7e5a69007d1a14544ee3c19e57a2a4  libheif-1.23.6-source.tar.gz
+ad55d78df381b9da9fdbea50a87139f00ddfdead8a9d0a844cb059a77cb17897  native-libs.json

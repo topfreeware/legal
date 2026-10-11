@@ -1,0 +1,84 @@
+{
+  "comment": "HANDOFF-002 section 2-1: the native HEIC decoding libraries of the product (ADR-002 B1), built from the upstream sources named here by scripts/build-native.ps1 - decoding only: no HEVC encoder (x265, kvazaar) and no other codec is compiled in, plugin loading is off. The built files go to native/win-x64 (not in Git); their bytes are pinned below and scripts/build-native.ps1 refuses a build that differs. To change a version or an option: edit this file, run scripts/build-native.ps1 -UpdatePins, run every test including scripts/golden-update.ps1 -Check, and update THIRD-PARTY-NOTICES.txt in the same commit. Both libraries are LGPL: each stays a separate DLL so that it can be replaced by another build with the same interface.",
+  "platform": "win-x64",
+  "libraries": [
+    {
+      "name": "libde265",
+      "version": "1.1.3",
+      "license": "LGPL-3.0-or-later",
+      "repository": "https://github.com/strukturag/libde265.git",
+      "tag": "v1.1.3",
+      "commit": "ba62bf4cfb3242f3bf0a45617ff09e35236e4d82",
+      "patches": [ "native-patches/libde265-max-nal-size.patch" ],
+      "patchesConfirmed": "Kev, 2026-10-11: the patched build is the product's build (option A of the HANDOFF-002 report, PROJECT_STATUS.md section 8.4). The other options were the unpatched library (sample syn-13 and every picture stored as one NAL unit above 16 MiB cannot be converted) and libde265 1.0.19 (crashes, lacks published security fixes). A library that is patched without this entry needs a top-level 'pendingDecision' text instead, which makes scripts/package.ps1 refuse to package.",
+      "patchesNote": "One changed line: the default of libde265's own limit for the size of a single NAL unit goes from 16 MiB to 256 MiB. libde265 1.1.0 introduced the limit; libheif 1.23.6 hands its image-size limit to libde265 but has no setting for this one, so a picture stored as one NAL unit above 16 MiB (sample syn-13: 48 MP in a single NAL of 17,276,919 bytes) is refused with 'NAL unit size exceeds security limit'. Every other limit of both libraries stays as upstream.",
+      "optionsNote": "ENABLE_DECODER / ENABLE_ENCODER switch the command-line tools dec265 / enc265 (and, for the encoder, its code inside the library); the HEVC decoder itself is always part of the library.",
+      "cmakeOptions": [
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DENABLE_SDL=OFF",
+        "-DENABLE_DECODER=OFF",
+        "-DENABLE_ENCODER=OFF",
+        "-DENABLE_SHERLOCK265=OFF",
+        "-DENABLE_INTERNAL_DEVELOPMENT_TOOLS=OFF",
+        "-DWITH_FUZZERS=OFF"
+      ]
+    },
+    {
+      "name": "libheif",
+      "version": "1.23.6",
+      "license": "LGPL-3.0-or-later",
+      "repository": "https://github.com/strukturag/libheif.git",
+      "tag": "v1.23.6",
+      "commit": "f81f28ac014b1c28dee483ac45b72c6b05bc421a",
+      "optionsNote": "Everything that is not the built-in libde265 HEVC decoder is switched off. With MSVC the library is built as heif.dll; scripts/build-native.ps1 stores it as libheif.dll, the name LibHeifSharp imports (see builtAs below).",
+      "cmakeOptions": [
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DENABLE_PLUGIN_LOADING=OFF",
+        "-DWITH_LIBDE265=ON",
+        "-DWITH_LIBDE265_PLUGIN=OFF",
+        "-DWITH_X265=OFF",
+        "-DWITH_KVAZAAR=OFF",
+        "-DWITH_UVG266=OFF",
+        "-DWITH_VVDEC=OFF",
+        "-DWITH_VVENC=OFF",
+        "-DWITH_X264=OFF",
+        "-DWITH_OpenH264_DECODER=OFF",
+        "-DWITH_DAV1D=OFF",
+        "-DWITH_AOM_DECODER=OFF",
+        "-DWITH_AOM_ENCODER=OFF",
+        "-DWITH_SvtEnc=OFF",
+        "-DWITH_RAV1E=OFF",
+        "-DWITH_JPEG_DECODER=OFF",
+        "-DWITH_JPEG_ENCODER=OFF",
+        "-DWITH_OpenJPEG_DECODER=OFF",
+        "-DWITH_OpenJPEG_ENCODER=OFF",
+        "-DWITH_OPENJPH_ENCODER=OFF",
+        "-DWITH_FFMPEG_DECODER=OFF",
+        "-DWITH_UNCOMPRESSED_CODEC=OFF",
+        "-DWITH_WEBCODECS=OFF",
+        "-DWITH_HEADER_COMPRESSION=OFF",
+        "-DWITH_LIBSHARPYUV=OFF",
+        "-DWITH_EXAMPLES=OFF",
+        "-DWITH_GDK_PIXBUF=OFF",
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_DOCUMENTATION=OFF",
+        "-DBUILD_DEVELOPMENT_TOOLS=OFF",
+        "-DWITH_FUZZERS=OFF",
+        "-DENABLE_EXPERIMENTAL_FEATURES=OFF",
+        "-DENABLE_MULTITHREADING_SUPPORT=ON",
+        "-DENABLE_PARALLEL_TILE_DECODING=ON"
+      ]
+    }
+  ],
+  "build": {
+    "generator": "Ninja",
+    "configuration": "Release",
+    "runtime": "dynamic C runtime (/MD); the Visual C++ runtime files travel with the package (store/vc-runtime.json)",
+    "reproducibility": "/Brepro for the compiler and the linker: no time stamps in the files",
+    "toolchain": "MSVC toolset 14.51.36231 (cl 19.51.36257), Windows SDK 10.0.28000.0, CMake 4.3.1-msvc1, Ninja 1.13.2"
+  },
+  "files": [
+    { "fileName": "libde265.dll", "builtAs": "libde265.dll", "sha256": "0de196eb4b8c59be28bda36758a9341829fc49cde9ce6e4d2ba3a15516157bc0", "bytes": 370176 },
+    { "fileName": "libheif.dll", "builtAs": "heif.dll", "sha256": "f07e64d2d4781ee16e7f75498870b7d0684e4f221d9b84b6296ad1b0d65ded1f", "bytes": 1403392 }
+  ]
+}

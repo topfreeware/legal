@@ -1,0 +1,13 @@
+diff --git a/libde265/decctx.h b/libde265/decctx.h
+index 80bc9d4..9afc48a 100644
+--- a/libde265/decctx.h
++++ b/libde265/decctx.h
+@@ -373,7 +373,7 @@ class decoder_context : public base_context {
+   de265_security_limits param_security_limits = {
+     1,                // version
+     8192 * 8192,      // max_image_size_pixels
+-    16 * 1024 * 1024, // max_NAL_size_bytes
++    256 * 1024 * 1024, // max_NAL_size_bytes - MODIFIED 2026-10-10 for HEIC Batch Converter Pro: upstream value is 16 * 1024 * 1024
+     256               // max_SEI_messages
+   };
+ 
